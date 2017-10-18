@@ -3,7 +3,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: golang
+    repository: glide
     tag: 1.9.1
 
 inputs:
