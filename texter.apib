@@ -1,0 +1,107 @@
+FORMAT: 1A
+
+# Rapid Response Texter API
+This document describes the various API calls you can make with the Rapid Response texter.
+
+# Group Service Health
+## GET /health-check
+This call returns a simple structure that determines whether or not the API is recieving traffic. It doesn't reason about the availability of the service, only if you can ask it for this route.
+
++ Response 200 (application/json)
+```
+{
+    "gtg": true 
+}
+```
+
+# Group Communication APIs
+Various resources and APIs for sending messages to users and handling campaigns.
+
+## POST /messages/intro
+Post to this route in order to ask the texter to send SMS messages to the list of users in the body of the request.  The texter will block until all messages are sent, and will only send a maxiumum of 5 at a time.  
++ Attributes (Recipient)
++ Request (application/json)
++ Response 202 (application/json)
++ Response 400 (application/json)
+    + Attributes (Error Struct)
+
+## POST /campaigns/{campaignId}/approve
+Post to this route in order to ask the texter to send SMS messages to the list of approvers for a given campaign.
++ Parameters
+    + campaignId (number)
++ Attributes (ApprovalRequest)
++ Request (application/json)
++ Response 202 (application/json)
++ Response 400 (application/json)
+    + Attributes (Error Struct)
++ Response 404 (application/json)
+
+## POST /campaigns/test
+Post to this route in order to ask the texter to send a test message to the target user. The Texter will use the
+zip code passed in the body to do replacements in the body, if applicable.
+
++ Attributes (TestMessage)
++ Request (application/json)
++ Response 202 (application/json)
++ Response 400 (application/json)
+    + Attributes (Error Struct)
++ Response 404 (application/json)
+
+# POST /campaigns
+Hit this route in order to start a campaign. This call will block until the campaign has been spun up and is successfully messaging to Twilio.
++ Attributes (Campaign)
++ Request (application/json)
++ Response 202 (application/json)
++ Response 400 (application/json)
+    + Attributes (Error Struct)
+
+# DELETE /campaigns/{objectId}
+Hit this route in order to stop a campaign. This call will block until the campaign has been stopped and the pointer in the audience list has been saved. 
++ Parameters
+    + objectId (string)
++ Response 202 (application/json)
++ Response 400 (application/json)
+This is returned when you attempt to stop a campaign that doesn't exist.
+    + Attributes (Error Struct)
+
+# POST /incoming/
+This route is where all Twilio requests are routed to. The handler responsible for the incoming data will figure out how to route the request to the appropriate business logic: either approvals, unsubscribing a user, or verifying a sign up.
++ Request (application/x-www-form-urlencoded)
+A URLEncoded body with the Twilio message structure contained inside. No idea why they don't just send us JSON.
+    + Body
+    + Schema
++ Response 201 (application/json)
+
+# Data Structures
+## Error Struct (object)
++ status: 400 (number)
++ message: You did it wrong (string)
+
+## Campaign (object)
++ _id: My Campaign (string)
++ body: My cool {{ replacable }} message (string)
++ createdFrom: 123 (string)
++ audience: 1 (number)
+
+## Recipient (object)
++ name: jduv (string)
++ email: dude@dude.com (string)
++ phoneNumber: 4045551234 (string)
+
+## TestMessage (object)
++ phoneNumber: 4045551234 (string)
++ zipCode: 30328 (string)
++ body: Test message with {{ replacements }} (string)
+
+## ApprovalRequest (object)
++ _id: ABCDEF (string)
++ campaignID: 123145 (number)
++ body: The Body of the message to send to approvers (string)
++ version: 1 (number)
++ approvers (array[Approver])
+
+## Approver (object)
++ _id: ABCDEF (string)
++ name: jduv (string)
++ email: dude@dude.com (string)
++ phoneNumber: 4045551234 (string)
