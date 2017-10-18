@@ -1,0 +1,6 @@
+#!/bin/bash
+export GOPATH=$(pwd)
+export GOBIN=$GOPATH/bin
+
+go fmt 7factor.io/...
+go install 7factor.io/...
