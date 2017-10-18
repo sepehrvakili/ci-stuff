@@ -1,0 +1,14 @@
+resources:
+  - name: 7factor-texter
+    type: git
+    source: 
+      uri: https://github.com/jduv/201709-atlcodecamp-tddinfra.git
+      branch: master
+
+jobs:
+  - name: build
+    plan:
+      - get: 7factor-texter
+        trigger: true
+      - task: build
+        file: texter/ci/tasks/build.yml
