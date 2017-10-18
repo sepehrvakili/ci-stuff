@@ -2,7 +2,7 @@ resources:
   - name: texter
     type: git
     source: 
-      uri: https://github.com/jduv/201709-atlcodecamp-tddinfra.git
+      uri: https://github.com/jduv/201710-anarchy-workshop.git
       branch: master
 
 jobs:
