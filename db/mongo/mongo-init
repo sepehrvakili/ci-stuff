@@ -1,31 +1,14 @@
-rrdb = db.getSiblingDB(rrnDbName)
-rrdb.createUser({
-    user: rrnUserName,
-    pwd: rrnPass,
+db = db.getSiblingDB(dbname)
+db.createUser({
+    user: username,
+    pwd: dbpass,
     roles: [
         {
             role: "dbOwner",
-            db: rrnDbName
+            db: dbname
         }
     ]
 })
 
 // static collection creation.
-rrdb.createCollection("MessageTemplates")
-rrdb.MessageTemplates.insertMany([{
-        "key": "approval-sms",
-        "body": "CREDO RapidResponders is requesting approval for campaign: [%v]. Please reply %v to approve.",
-        "active": true
-},{
-        "key": "intro-sms",
-        "body": "Thank you for becoming a CREDO Rapid Responder. We’ll be texting you with our most urgent and time-sensitive campaigns so that you can fight for your progressive values from your phone. If you want to stop receiving Rapid Responder messages, simply text “STOP” at any time.",
-        "active": true
-},{
-        "key": "inactive",
-        "body": "This message exists for testing purposes",
-        "active": false
-}])
-
-rrdb.createCollection("ApprovalRequests")
-rrdb.createCollection("LostAndFound")
-rrdb.createCollection("Campaigns")
+db.createCollection("Messages")
