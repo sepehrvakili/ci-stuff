@@ -11,4 +11,4 @@ inputs:
 
 run:
   dir: ./texter/
-  path: ./ci/scripts/test.sh
+  path: ci/scripts/test.sh
