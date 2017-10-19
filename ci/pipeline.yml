@@ -1,14 +1,16 @@
 resources:
-  - name: texter
-    type: git
-    source: 
-      uri: https://github.com/jduv/201710-anarchy-workshop.git
-      branch: master
+- name: texter
+  type: git
+  source: 
+    uri: https://github.com/jduv/201710-anarchy-workshop.git
+    branch: master
 
 jobs:
-  - name: build
-    plan:
-      - get: texter
-        trigger: true
-      - task: build
-        file: texter/ci/tasks/build.yml
+- name: build
+  plan:
+  - get: texter
+    trigger: true
+  - task: build
+    file: texter/ci/tasks/build.yml
+  - task: test
+    file: texter/ci/tasks/test.yml
