@@ -11,9 +11,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
-	"time"
 )
 
 // Message represents anything you want to send to twilio.
@@ -35,26 +33,7 @@ func (m Message) URLEncode() io.Reader {
 		values.Set("MessagingServiceSid", os.Getenv("TW_MSGSID"))
 	}
 
-	log.Printf("values: %v", values)
 	return strings.NewReader(values.Encode())
-}
-
-// Segments will create a slice of messages from a single message.
-// This exists as a work around for SMS messages that are not
-// concatenated inside carrier networks (maily only due to sprint)
-func (m Message) Segments() []Message {
-	chunker := NewMessageChunker()
-	splits := chunker.Split(m.Body)
-
-	if len(splits) > 1 {
-		var messages []Message
-		for _, item := range splits {
-			messages = append(messages, Message{To: m.To, From: m.From, Body: item})
-		}
-		return messages
-	}
-
-	return []Message{m}
 }
 
 // HTTPClient is an interface for mocking HTTP clients. This is satisfied by the GoLang
@@ -126,12 +105,6 @@ func NewTW() Twilio {
 // send an SMS through Twilio to the target user with the appropriate
 // message.
 func (c Twilio) SendSMS(msg *Message) (int, error) {
-	throttle, err := strconv.Atoi(os.Getenv("SEGMENT_TICKINTERVAL"))
-	if err != nil {
-		throttle = 1000
-		log.Printf("Using default value for throttle: %v", throttle)
-	}
-
 	// Very simple regex
 	regex, err := regexp.Compile(`[1]?[0-9]{10}`)
 
@@ -144,24 +117,10 @@ func (c Twilio) SendSMS(msg *Message) (int, error) {
 		return http.StatusBadRequest, errors.New(errorMsg)
 	}
 
-	segments := msg.Segments()
-
-	var code int
-	for _, segment := range segments {
-		code, err = c.sendRequest(&segment)
-
-		if err != nil {
-			return code, err
-		}
-
-		time.Sleep(time.Duration(throttle) * time.Millisecond)
-	}
-
-	return code, err
+	return c.sendRequest(msg)
 }
 
 func (c Twilio) sendRequest(msg *Message) (int, error) {
-
 	if c.Client == nil {
 		return http.StatusInternalServerError, errors.New("http client is nil, cannot proceed")
 	}

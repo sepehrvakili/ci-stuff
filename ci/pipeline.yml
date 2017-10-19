@@ -12,5 +12,10 @@ jobs:
     trigger: true
   - task: build
     file: texter/ci/tasks/build.yml
+
+- name: test
+  plan:
+  - get: texter
+    trigger: true
   - task: test
     file: texter/ci/tasks/test.yml

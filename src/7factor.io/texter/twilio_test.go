@@ -81,57 +81,6 @@ func Test_URLEncode(context *testing.T) {
 	}
 }
 
-func Test_SegmentsCreatesTheExpectedNumberOfMessages(context *testing.T) {
-	var table = []struct {
-		in               Message
-		expectedSegments int
-	}{
-		{
-			Message{
-				To:   "4045556789",
-				From: "7065551234",
-				Body: "012345"},
-			1,
-		}, {
-			Message{
-				To:   "4045556789",
-				From: "7065551234",
-				Body: "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"},
-			1,
-		}, {
-			Message{
-				To:   "4045556789",
-				From: "7065551234",
-				Body: "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"},
-			2,
-		}, {
-			Message{
-				To:   "4045556789",
-				From: "7065551234",
-				Body: "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"},
-			3,
-		},
-	}
-
-	for _, test := range table {
-		segments := test.in.Segments()
-
-		if len(segments) != test.expectedSegments {
-			context.Errorf("Segments(%q) => got %v segments, want %v", test.in, len(segments), test.expectedSegments)
-		}
-
-		for _, s := range segments {
-			if s.To != test.in.To {
-				context.Errorf("Error creating segment, To doesn't match! got %v want %v", s.To, test.in.To)
-			}
-
-			if s.From != test.in.From {
-				context.Errorf("Error creating segment, To doesn't match! got %v want %v", s.From, test.in.From)
-			}
-		}
-	}
-}
-
 func Test_ExceptionAsErrorReturnsExpected(context *testing.T) {
 	exception := TwilioException{
 		Status:   500,

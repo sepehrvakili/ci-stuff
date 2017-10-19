@@ -15,12 +15,12 @@ type TagMerger interface {
 
 // NewTagMerger is a factory method that creates a new tag merger
 func NewTagMerger() TagMerger {
-	return AKTagMerger{}
+	return CongressTagMerger{}
 }
 
-// AKTagMerger is a basic merger that handles information for
+// CongressTagMerger is a basic merger that handles information for
 // house of representative members.
-type AKTagMerger struct {
+type CongressTagMerger struct {
 }
 
 // Local file matcher, no need to make this an instance variable.
@@ -39,7 +39,7 @@ const UnknownDataTypeReplacement = "unknown-data-type"
 const InvalidFieldNameReplacement = "invalid-field-name"
 
 // Map of tags to struct field names.
-var akTags = map[string]string{
+var tags = map[string]string{
 	"{{targets.title}}":       "LongTitle",
 	"{{targets.full_name}}":   "OfficialName",
 	"{{targets.phone}}":       "PhoneNumber",
@@ -50,9 +50,9 @@ var akTags = map[string]string{
 // MergeRep merges information from the target entity into the body. The
 // entity will be assumed to be a rep info object, but can be anything.
 // So long as the keys line up we care not.
-func (m AKTagMerger) MergeRep(body string, info RepInfo) string {
+func (m CongressTagMerger) MergeRep(body string, info RepInfo) string {
 	return matcher.ReplaceAllStringFunc(body, func(match string) string {
-		fieldName, ok := akTags[cleanTag(match)]
+		fieldName, ok := tags[cleanTag(match)]
 		if !ok {
 			return UnknownTagReplacement
 		}
@@ -79,9 +79,9 @@ func (m AKTagMerger) MergeRep(body string, info RepInfo) string {
 
 // MergeUnknown will simply replace all tags this merger understands with
 // default words.
-func (m AKTagMerger) MergeUnknown(body string) string {
+func (m CongressTagMerger) MergeUnknown(body string) string {
 	return matcher.ReplaceAllStringFunc(body, func(match string) string {
-		_, ok := akTags[cleanTag(match)]
+		_, ok := tags[cleanTag(match)]
 		if !ok {
 			return UnknownTagReplacement
 		}

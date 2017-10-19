@@ -55,9 +55,9 @@ func Test_GetMongoCredentials(context *testing.T) {
 	expectedDB := "bubbles"
 
 	os.Setenv("MONGO_URL", expectedHost)
-	os.Setenv("MONGO_RRN_USER", expectedUser)
-	os.Setenv("MONGO_RRN_PASS", expectedPass)
-	os.Setenv("MONGO_RRN_DB", expectedDB)
+	os.Setenv("MONGO_USER", expectedUser)
+	os.Setenv("MONGO_PASS", expectedPass)
+	os.Setenv("MONGO_DB", expectedDB)
 	creds := GetMongoCredsFromEnv()
 
 	if expectedHost != creds.Host {
@@ -77,17 +77,17 @@ func Test_GetMongoCredentials(context *testing.T) {
 	}
 }
 
-func Test_GetAKCredentials(context *testing.T) {
+func Test_GetCongressDBCredentials(context *testing.T) {
 	expectedHost := "myhost"
 	expectedUser := "jduv"
 	expectedPass := "supersecurepw"
 	expectedDB := "bubbles"
 
-	os.Setenv("AK_URL", expectedHost)
-	os.Setenv("AK_USER", expectedUser)
-	os.Setenv("AK_PASS", expectedPass)
-	os.Setenv("AK_DBNAME", expectedDB)
-	creds := GetAKCredsFromEnv()
+	os.Setenv("CNG_URL", expectedHost)
+	os.Setenv("CNG_USER", expectedUser)
+	os.Setenv("CNG_PASS", expectedPass)
+	os.Setenv("CNG_DBNAME", expectedDB)
+	creds := GetCongressDBCredsFromEnv()
 
 	if expectedHost != creds.Host {
 		context.Errorf("Hostname not set correctly. want %v got %v", expectedHost, creds.Host)
@@ -114,11 +114,11 @@ func Test_ToDSN(context *testing.T) {
 	expectedDSN := fmt.Sprintf("%v:%v@tcp(%v)/%v?timeout=30s", expectedUser, expectedPass,
 		expectedHost, expectedDB)
 
-	os.Setenv("AK_URL", expectedHost)
-	os.Setenv("AK_USER", expectedUser)
-	os.Setenv("AK_PASS", expectedPass)
-	os.Setenv("AK_DBNAME", expectedDB)
-	creds := GetAKCredsFromEnv()
+	os.Setenv("CNG_URL", expectedHost)
+	os.Setenv("CNG_USER", expectedUser)
+	os.Setenv("CNG_PASS", expectedPass)
+	os.Setenv("CNG_DBNAME", expectedDB)
+	creds := GetCongressDBCredsFromEnv()
 	dsn := creds.ToDSN()
 
 	if dsn != expectedDSN {

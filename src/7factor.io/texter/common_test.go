@@ -6,20 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/husobee/vestigo"
 )
-
-type MockHTTPClient struct {
-	DoMethodCallCount int
-	MockDoMethod      func(request *http.Request) (*http.Response, error)
-}
-
-func (m *MockHTTPClient) Do(request *http.Request) (*http.Response, error) {
-	m.DoMethodCallCount++
-	return m.MockDoMethod(request)
-}
 
 // Implementations of this thing should implement the assert stage of the test.
 // This is always called last.
@@ -64,154 +52,53 @@ func Run(context *testing.T, toRun TestParameters) {
 	toRun.assertions(context, recorder, request)
 }
 
+// Mock HTTP client for intercepting HTTP calls
+type MockHTTPClient struct {
+	MockDoMethod func(request *http.Request) (*http.Response, error)
+}
+
+func (m *MockHTTPClient) Do(request *http.Request) (*http.Response, error) {
+	return m.MockDoMethod(request)
+}
+
 // MOCK Twilio client
 type MockTwilioClient struct {
-	SendSMSCallCount  int
 	MockSendSMSMethod func(msg *Message) (int, error)
 }
 
 func (m *MockTwilioClient) SendSMS(msg *Message) (int, error) {
-	m.SendSMSCallCount++
 	return m.MockSendSMSMethod(msg)
 }
 
 // MOCK primary DB
 type MockDB struct {
-	GetActiveMessageTemplatesCallCount int
-	GetMessageTemplateByKeyCallCount   int
-	RegisterApprovalCallCount          int
-	StowMessageCallCount               int
-	ApproveCampaignCallCount           int
-	CloseCallCount                     int
-	GetMostRecentApprovalByIDCallCount int
-	SaveCampaignStateCallCount         int
-	GetCampaignStateCallCount          int
-	MockGetActiveMessageTemplates      func() ([]MessageTemplate, error)
-	MockGetMessageTemplateByKey        func(key string) (MessageTemplate, error)
-	MockRegisterApproval               func(approver ApprovalRequest) error
-	MockGetMostRecentApprovalByID      func(cid int) (ApprovalRequest, error)
-	MockApproveCampaign                func(approval ApprovalRequest, approver Approver) error
-	MockSaveCampaignState              func(toSave CampaignState) error
-	MockGetCampaignStateByID           func(campaignID bson.ObjectId) (CampaignState, error)
-	MockStowMessage                    func(msg TwilioMessage) error
-	MockClose                          func()
+	MockStowMessage func(msg Message) error
+	MockClose       func()
 }
 
-func (db *MockDB) GetActiveMessageTemplates() ([]MessageTemplate, error) {
-	db.GetActiveMessageTemplatesCallCount++
-	return db.MockGetActiveMessageTemplates()
-}
-
-func (db *MockDB) GetMessageTemplateByKey(key string) (MessageTemplate, error) {
-	db.GetMessageTemplateByKeyCallCount++
-	return db.MockGetMessageTemplateByKey(key)
-}
-
-func (db *MockDB) RegisterApproval(approver ApprovalRequest) error {
-	db.RegisterApprovalCallCount++
-	return db.MockRegisterApproval(approver)
-}
-
-func (db *MockDB) GetMostRecentApprovalByID(cid int) (ApprovalRequest, error) {
-	db.GetMostRecentApprovalByIDCallCount++
-	return db.MockGetMostRecentApprovalByID(cid)
-}
-
-func (db *MockDB) ApproveCampaign(approval ApprovalRequest, approver Approver) error {
-	db.ApproveCampaignCallCount++
-	return db.MockApproveCampaign(approval, approver)
-}
-func (db *MockDB) GetCampaignStateByID(campaignID bson.ObjectId) (CampaignState, error) {
-	db.GetCampaignStateCallCount++
-	return db.MockGetCampaignStateByID(campaignID)
-}
-
-func (db *MockDB) SaveCampaignState(toSave CampaignState) error {
-	db.SaveCampaignStateCallCount++
-	return db.MockSaveCampaignState(toSave)
-}
-
-func (db *MockDB) StowMessage(msg TwilioMessage) error {
-	db.StowMessageCallCount++
+func (db *MockDB) StowMessage(msg Message) error {
 	return db.MockStowMessage(msg)
 }
 
 func (db *MockDB) Close() {
-	db.CloseCallCount++
 	db.MockClose()
 }
 
-// MOCK AK
-type MockAK struct {
-	MockGetCurrentSubscribers   func() (CampaignTargets, error)
-	MockGetRepresentatives      func() (Representatives, error)
-	MockGuessDistrictForZip     func(zip string) (string, error)
-	MockGetEmailsForPhoneNumber func(phoneNumber string) ([]string, error)
-	MockClose                   func()
+// MOCK Congress
+type MockCongressDB struct {
+	MockGetRepresentatives  func() (Representatives, error)
+	MockGuessDistrictForZip func(zip string) (string, error)
+	MockClose               func()
 }
 
-func (ak *MockAK) GetCurrentSubscribers() (CampaignTargets, error) {
-	return ak.MockGetCurrentSubscribers()
-}
-
-func (ak *MockAK) GetRepresentatives() (Representatives, error) {
+func (ak *MockCongressDB) GetRepresentatives() (Representatives, error) {
 	return ak.MockGetRepresentatives()
 }
 
-func (ak *MockAK) GuessDistrictForZip(zip string) (string, error) {
+func (ak *MockCongressDB) GuessDistrictForZip(zip string) (string, error) {
 	return ak.MockGuessDistrictForZip(zip)
 }
 
-func (ak *MockAK) GetEmailsForPhoneNumber(phoneNumber string) ([]string, error) {
-	return ak.MockGetEmailsForPhoneNumber(phoneNumber)
-}
-
-func (ak *MockAK) Close() {
+func (ak *MockCongressDB) Close() {
 	ak.MockClose()
-}
-
-// MOCK API
-type MockAPI struct {
-	GetAllApproversCallCount   int
-	IsSecuredCallCount         int
-	UnsubscribeCallCount       int
-	SubscribeCallCount         int
-	ApproveCampaignCallCount   int
-	CampaignCompletedCallCount int
-	MockGetAllApprovers        func() ([]Approver, error)
-	MockIsSecured              func() (bool, error)
-	MockUnsubscribe            func(email []string) error
-	MockSubscribe              func(email []string) error
-	MockApproveCampaign        func(approval ApprovalRequest, approver Approver) error
-	MockCampaignCompleted      func(status int, campaign Campaign) error
-}
-
-func (m *MockAPI) GetAllApprovers() ([]Approver, error) {
-	m.GetAllApproversCallCount++
-	return m.MockGetAllApprovers()
-}
-
-func (m *MockAPI) IsSecured() (bool, error) {
-	m.IsSecuredCallCount++
-	return m.MockIsSecured()
-}
-
-func (m *MockAPI) ApproveCampaign(approval ApprovalRequest, approver Approver) error {
-	m.ApproveCampaignCallCount++
-	return m.MockApproveCampaign(approval, approver)
-}
-
-func (m *MockAPI) CampaignCompleted(status int, campaign Campaign) error {
-	m.CampaignCompletedCallCount++
-	return m.MockCampaignCompleted(status, campaign)
-}
-
-func (m *MockAPI) Unsubscribe(email []string) error {
-	m.UnsubscribeCallCount++
-	return m.MockUnsubscribe(email)
-}
-
-func (m *MockAPI) Subscribe(email []string) error {
-	m.SubscribeCallCount++
-	return m.MockSubscribe(email)
 }

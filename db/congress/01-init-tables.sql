@@ -1,0 +1,38 @@
+CREATE TABLE
+core_target
+(
+    id INT NOT NULL AUTO_INCREMENT,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    hidden TINYINT(1) NOT NULL,
+    type VARCHAR(255) NOT NULL,
+    seat VARCHAR(255) NOT NULL,
+    country VARCHAR(255) NOT NULL,
+    state VARCHAR(255) NOT NULL,
+    us_district VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    long_title VARCHAR(255) NOT NULL,
+    FIRST VARCHAR(255) NOT NULL,
+    last VARCHAR(255) NOT NULL,
+    official_full VARCHAR(255) NOT NULL,
+    nickname VARCHAR(255) NOT NULL,
+    phone VARCHAR(255) NOT NULL,
+    fax VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    gender VARCHAR(1) NOT NULL,
+    party VARCHAR(255) NOT NULL,
+    district_name VARCHAR(255) NOT NULL,
+    city VARCHAR(255) NOT NULL,
+    region VARCHAR(255) NOT NULL,
+    county VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id),
+    INDEX core_target_created_at (created_at),
+    INDEX core_target_hidden (hidden),
+    INDEX core_target_type (type),
+    INDEX core_target_seat (seat),
+    INDEX core_target_country (country),
+    INDEX core_target_state (state),
+    INDEX core_target_us_district (us_district),
+    INDEX core_target_district_name (district_name)
+)
+ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -46,19 +46,19 @@ func (creds DBCreds) ToDSN() string {
 func GetMongoCredsFromEnv() DBCreds {
 	return DBCreds{
 		Host:   os.Getenv("MONGO_URL"),
-		User:   os.Getenv("MONGO_RRN_USER"),
-		Pass:   os.Getenv("MONGO_RRN_PASS"),
-		DBName: os.Getenv("MONGO_RRN_DB"),
+		User:   os.Getenv("MONGO_USER"),
+		Pass:   os.Getenv("MONGO_PASS"),
+		DBName: os.Getenv("MONGO_DB"),
 	}
 }
 
-// GetAKCredsFromEnv grabs all the appropriate creds from the
+// GetCongressDBCredsFromEnv grabs all the appropriate creds from the
 // environment and creates an object for it.
-func GetAKCredsFromEnv() DBCreds {
+func GetCongressDBCredsFromEnv() DBCreds {
 	return DBCreds{
-		Host:   os.Getenv("AK_URL"),
-		User:   os.Getenv("AK_USER"),
-		Pass:   os.Getenv("AK_PASS"),
-		DBName: os.Getenv("AK_DBNAME"),
+		Host:   os.Getenv("CNG_URL"),
+		User:   os.Getenv("CNG_USER"),
+		Pass:   os.Getenv("CNG_PASS"),
+		DBName: os.Getenv("CNG_DBNAME"),
 	}
 }
