@@ -1,6 +1,0 @@
-#!/bin/sh
-export GOPATH=$(pwd)
-export GOBIN=$GOPATH/bin
-
-cd src && glide install 7factor.io/...
-go test -short -v --cover 7factor.io/...
