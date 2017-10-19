@@ -3,12 +3,14 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: golang
-    tag: 1.9.1
+    repository: instrumentisto/glide
+    tag: 0.13.0-go1.9
 
 inputs:
 - name: texter
 
 run:
   dir: ./texter/
-  path: ci/scripts/test.sh
+  path: sh
+  args:
+    - ci/scripts/test.sh
