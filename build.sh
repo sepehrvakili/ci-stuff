@@ -1,4 +1,6 @@
 #!/bin/sh
+export GOPATH=$(pwd)
+export GOBIN=$GOPATH/bin
 
 # This script will build the entire project using standardized
 # GoLang tooling. Make sure you've sourced the gopath first or
