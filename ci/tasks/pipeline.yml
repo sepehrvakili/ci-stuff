@@ -1,0 +1,23 @@
+resources:
+- name: source-code
+  type: git
+  source:
+    uri: https://github.com/sepehrvakili/ci-stuff.git
+    branch: cistuff
+    # private_key: |
+    #   -----BEGIN RSA PRIVATE KEY-----
+    #   MIIEowIBAAKCAQEAtCS10/f7W7lkQaSgD/mVeaSOvSF9ql4hf/zfMwfVGgHWjj+W
+    #   <Lots more text>
+    #   DWiJL+OFeg9kawcUL6hQ8JeXPhlImG6RTUffma9+iGQyyBMCGd1l
+    #   -----END RSA PRIVATE KEY-----
+    # git_config:
+    # - name: core.bigFileThreshold
+    #   value: 10m
+    # disable_ci_skip: true
+
+jobs:
+- name: build
+  plan:
+  - get: source-code
+  - task: build
+    file: ci/tasks/build.yml
