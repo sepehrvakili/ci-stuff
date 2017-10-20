@@ -1,0 +1,48 @@
+# This docker compose file is used for spinning up a working
+# container suite and will run integration tests after the
+# containers have stabilized (in theory).
+version: '2'
+services:
+  texter:
+    build: .
+    networks:
+      - txt-net
+    env_file:
+      - .env
+    ports:
+      - "${HOST_PORT}:${CONT_PORT}"
+    links:
+      - txt_mongo
+      - cng_mysql
+  txt_mongo:
+    image: mongo:3.4
+    networks:
+      - txt-net
+    command: mongod --port ${MONGO_CONT_PORT}
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASS}
+      - MONGO_USER
+      - MONGO_PASS
+      - MONGO_DB
+    ports:
+      - "${MONGO_HOST_PORT}:${MONGO_CONT_PORT}"
+    volumes: 
+      - ./db/mongo:/docker-entrypoint-initdb.d/
+  cng_mysql:
+    image: mysql:5.6
+    networks:
+      - txt-net
+    environment: 
+      - MYSQL_USER=${CNG_USER}
+      - MYSQL_PASSWORD=${CNG_PASS}
+      - MYSQL_DATABASE=${CNG_DBNAME}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOTPW}
+    ports:
+      - "${MYSQL_HOST_PORT}:${MYSQL_CONT_PORT}"
+    volumes:
+      - ./db/congress:/docker-entrypoint-initdb.d/
+
+networks:
+  txt-net:
+    external: true
