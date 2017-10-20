@@ -2,6 +2,7 @@
 export GOPATH=$(pwd)
 export GOBIN=$GOPATH/bin
 
+cd src && glide i
 # This script will build the entire project using standardized
 # GoLang tooling. Make sure you've sourced the gopath first or
 # this will not worky.
